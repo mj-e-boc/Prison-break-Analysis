@@ -26,7 +26,7 @@ The series originally aired for four seasons from 2005 to 2009 and was briefly r
 
 ```{r show-image, eval=FALSE, echo=FALSE}
 # Uncomment and add path to image when available
-# knitr::include_graphics("path_to_prison_break_image.jpg")
+knitr::include_graphics("/Users/mjay/Desktop/prisonbreakpromo.jpg")
 ```
 
 ## Viewership Summary by Season
