@@ -1,6 +1,6 @@
 ---
 title: "Prison Break: Series Overview and Viewership Analysis"
-author: "Data Analyst"
+author: "Ronald Mjonono"
 date: "April 18, 2025"
 output:
   html_document:
@@ -10,3 +10,182 @@ output:
     toc_float: true
     code_folding: show
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(ggplot2)
+library(dplyr)
+library(knitr)
+```
+
+## Introduction
+
+*Prison Break* is an American crime drama television series created by Paul Scheuring for the Fox network. The story centers on two brothers: Lincoln Burrows, who is on death row for a crime he did not commit, and Michael Scofield, a structural engineer who deliberately incarcerates himself to break his brother out of prison. 
+
+The series originally aired for four seasons from 2005 to 2009 and was briefly revived for a fifth season in 2017. *Prison Break* was a ratings success in its early run – its 2005 debut attracted about **10.5 million** U.S. viewers. The first season's strong reception led to a full 22-episode order, and the show won the 2006 People's Choice Award for Favorite New TV Drama. Subsequent seasons continued to rate well but saw gradual declines in viewership and mixed critical response.
+
+```{r show-image, eval=FALSE, echo=FALSE}
+# Uncomment and add path to image when available
+# knitr::include_graphics("path_to_prison_break_image.jpg")
+```
+
+## Viewership Summary by Season
+
+```{r season-data}
+seasons <- c("S1", "S2", "S3", "S4", "S5")
+years <- c("2005-06", "2006-07", "2007-08", "2008-09", "2017")
+avg_viewers <- c(9.2, 9.3, 8.2, 6.1, 4.0)
+premiere_viewers <- c(10.5, 9.4, 7.5, 6.5, 3.8)
+finale_viewers <- c(10.2, 8.1, 7.4, 3.3, 2.3)
+max_viewers <- c(10.5, 10.1, 7.5, 6.5, 3.8)
+
+season_summary <- data.frame(
+  Season = seasons,
+  Years = years,
+  Average = avg_viewers,
+  Premiere = premiere_viewers,
+  Finale = finale_viewers,
+  Peak = max_viewers
+)
+
+knitr::kable(season_summary, 
+             caption = "Prison Break Viewership by Season (in millions)",
+             align = "lccccc")
+```
+
+### Detailed Season Breakdown
+
+* **Season 1 (2005–06):** Averaged **9.2 million** viewers per episode. The pilot garnered 10.5 million, and the finale had about **10.2 million** viewers.
+
+* **Season 2 (2006–07):** Averaged **9.3 million** viewers. The most-watched episode drew **10.1 million**, while the finale dropped to **8.1 million**.
+
+* **Season 3 (2007–08):** Averaged **8.2 million** viewers across a 13-episode run. The premiere had **7.5 million**, and the finale drew **7.4 million**.
+
+* **Season 4 (2008–09):** Averaged **6.1 million** viewers. The premiere started with **6.5 million**, and the finale dropped to **3.3 million**.
+
+* **Season 5 (2017):** Averaged **4.0 million** viewers. The premiere had **3.8 million**, and the finale fell to **2.3 million**.
+
+## Visualizing the Viewership Data
+
+### Season-wise Average Viewership
+
+```{r avg-viewership-bar}
+season_data <- data.frame(Season = seasons, Viewers = avg_viewers)
+
+ggplot(season_data, aes(x = Season, y = Viewers)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_text(aes(label = paste0(Viewers, "M")), vjust = -0.5, size = 3.5) +
+  labs(title = "Average Viewership per Season", 
+       y = "Viewers (Millions)",
+       caption = "Data source: Nielsen ratings") +
+  ylim(0, 12) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+### Premiere vs Finale Viewership
+
+```{r premiere-finale-comparison}
+premiere <- premiere_viewers
+finale <- finale_viewers
+
+trend_data <- data.frame(
+  Season = rep(seasons, each = 2),
+  Type = rep(c("Premiere", "Finale"), times = 5),
+  Viewers = c(premiere, finale)
+)
+
+ggplot(trend_data, aes(x = Season, y = Viewers, fill = Type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = paste0(Viewers, "M")), 
+            position = position_dodge(width = 0.9), 
+            vjust = -0.5, size = 3) +
+  labs(title = "Viewership Change from Premiere to Finale", 
+       y = "Viewers (Millions)",
+       caption = "Data source: Nielsen ratings") +
+  scale_fill_manual(values = c("Premiere" = "#3366CC", "Finale" = "#CC6633")) +
+  ylim(0, 12) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+### Viewership Trend Over Time
+
+```{r viewership-trend}
+# Creating a dataset for the line graph
+episodes <- data.frame(
+  Season = rep(c("S1", "S2", "S3", "S4", "S5"), each = 3),
+  Episode = rep(c("Premiere", "Mid-season", "Finale"), times = 5),
+  Viewers = c(10.5, 9.5, 10.2,  # S1 (estimated mid-season)
+              9.4, 9.8, 8.1,     # S2 (estimated mid-season)
+              7.5, 8.0, 7.4,     # S3 (estimated mid-season)
+              6.5, 5.0, 3.3,     # S4 (estimated mid-season)
+              3.8, 3.0, 2.3)     # S5 (estimated mid-season)
+)
+
+# Creating a season factor for proper ordering
+episodes$Season <- factor(episodes$Season, levels = c("S1", "S2", "S3", "S4", "S5"))
+episodes$Episode <- factor(episodes$Episode, levels = c("Premiere", "Mid-season", "Finale"))
+
+# Creating a combined season-episode variable for x-axis
+episodes$SeasonEp <- paste(episodes$Season, episodes$Episode, sep = "-")
+episodes$SeasonEp <- factor(episodes$SeasonEp, levels = unique(episodes$SeasonEp))
+
+# Plotting
+ggplot(episodes, aes(x = SeasonEp, y = Viewers, group = 1)) +
+  geom_line(color = "darkblue", size = 1) +
+  geom_point(color = "darkblue", size = 3) +
+  labs(title = "Prison Break Viewership Trend Across Seasons",
+       x = "Season - Episode Position",
+       y = "Viewers (Millions)",
+       caption = "Note: Mid-season values are estimates") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(face = "bold"))
+```
+
+## Observed Trends and Insights
+
+* **Season 1 and 2** had the highest viewership, with averages over 9 million.
+
+* **Season 3** marked the beginning of a decline, partly due to the 2007–08 Writers Guild strike.
+
+* **Season 4** saw a steep erosion, dropping by more than **3 million** from Season 2.
+
+* The **Season 5** revival failed to regain earlier audience numbers, ending with only **2.3 million** viewers.
+
+This decline reflects a combination of narrative fatigue, changing time slots, and long hiatuses. *Prison Break*'s initial hook captivated millions, but sustaining that level of interest proved difficult over time. Nevertheless, it remains a cult favorite and continues to attract new viewers via streaming platforms.
+
+## Conclusion
+
+*Prison Break* demonstrates a common pattern seen in many television series: strong initial interest followed by gradual viewership decline. What makes this show particularly interesting from an analytics perspective is:
+
+1. The relatively stable viewership through Seasons 1-3
+2. The sharp decline in Season 4
+3. The failed revival attempt with Season 5
+
+These patterns offer valuable insights for network executives and content creators about audience retention strategies and optimal series length. The show's continued popularity on streaming platforms suggests that while live viewership declined, the story itself maintained enough quality to develop a lasting legacy.
+
+```{r final-comparison, fig.height=6, fig.width=10}
+# Create a comprehensive comparison of all metrics
+all_data <- data.frame(
+  Season = rep(seasons, times = 4),
+  Metric = rep(c("Average", "Premiere", "Finale", "Peak"), each = 5),
+  Viewers = c(avg_viewers, premiere_viewers, finale_viewers, max_viewers)
+)
+
+ggplot(all_data, aes(x = Season, y = Viewers, fill = Metric)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  labs(title = "Prison Break: Complete Viewership Metrics",
+       subtitle = "Comparing average, premiere, finale and peak viewership across seasons",
+       y = "Viewers (Millions)",
+       caption = "Data source: Nielsen ratings") +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 14),
+        legend.position = "bottom")
+```
+
+---
+
+*Note: This analysis is based on U.S. viewership data and does not account for international audiences or streaming platform viewership.*
