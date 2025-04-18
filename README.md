@@ -24,8 +24,6 @@
 
 [R markdown showing Prison break reviews and Analysis of viewers]
 
-**[Prison break]** is a sneak peak into my abilities as a software developer
-
 ## 🛠 Built With <a name="built-with"></a>
 
 ### Tech Stack <a name="tech stack"></a>
